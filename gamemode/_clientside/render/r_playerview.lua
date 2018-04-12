@@ -44,7 +44,12 @@ local function playerView(ply, pos, angles, fov)
 	updateHeadBob(ply:IsOnGround() and ply:GetVelocity():Length() > FOOTSTEP_TRIGGER_VELOCITY and (ply:KeyDown(IN_FORWARD) or ply:KeyDown(IN_BACK) or ply:KeyDown(IN_MOVELEFT) or ply:KeyDown(IN_MOVERIGHT)), ply:Crouching())
 	
 	if CLNET_VIEW_THIRDPERSON then
-		view.origin = pos - angles:Forward()*100
+		local tr = util.TraceLine( {
+			start = pos,
+			endpos = pos - ply:EyeAngles():Forward() * 100,
+			filter = function( ent ) if ( ent:GetClass() == "prop_physics" ) then return true end end
+		} )
+		view.origin = tr.HitPos + ply:EyeAngles():Forward()*15
 	else
 		local fwdVec = (Angle(0, angles.yaw, 0)):Forward() * 10
 		view.origin = pos + Vector(fwdVec.x, fwdVec.y, -10 + bobHeadCurAdj)
